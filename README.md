@@ -7,7 +7,7 @@ Shows time, current AQI, 10m average, 6 hour average, e.g.:
     AQI 161
     10m avg
       167
-      6Hav 115
+    6Hav 115
 
 # Usage
 
