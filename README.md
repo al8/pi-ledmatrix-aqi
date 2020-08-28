@@ -25,4 +25,4 @@ python3 -m pip install python-aqi
 
 ## run
 
-./getaqi.py <sensor_id>
+    ./getaqi.py <sensor_id>
