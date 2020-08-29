@@ -74,22 +74,33 @@ def getpurpleair(id):
     stats = json.loads(results['Stats'])
 
     aqi = convert(stats["v1"])
+    aqi6h = convert(stats["v4"])
 
     aqirealtime = convert(stats["v"])
 
-    return aqi, [
-        ('age', results["AGE"]),
-        ('cur', aqirealtime),
-        ('10m', aqi),
-        ('L', results['Label']),
-    ]
+    age = results["AGE"]
+
+    if age > 5:
+        rows = [
+           'cur %s' % aqirealtime,
+           '10m %s' % aqi,
+           "%sm ago" % results["AGE"],
+           results['Label'],
+        ]
+    else:
+        rows = [
+            'AQI %s' % aqirealtime,
+            '10m avg', 
+            '  %s' % aqi,
+            '6Hav %s' % aqi6h,
+        ]
+
+    return max([aqi, aqirealtime]), rows
 
 def getrows(sensor_id):
     
-    aqi, data = getpurpleair(sensor_id)
-    print("%s" % data)
-
-    rows = ["%s %s" % kv for kv in data]
+    aqi, rows = getpurpleair(sensor_id)
+    print("%s" % rows)
 
     return aqi, rows
 
@@ -99,8 +110,6 @@ def main(sensor_id):
     aqi = 0
 
     while True:
-        print(time.asctime())
-
         if testmode:
             aqi = aqi + 10
             rows = ["aqi %s" % aqi] * 4
@@ -123,8 +132,10 @@ def main(sensor_id):
                 '-b', '50',
                 '-C', '%s,%s,%s' % rgb,
             ],
-            stdin=subprocess.PIPE)
-        for r in [time.strftime("%I:%M")] + rows:
+            stdin=subprocess.PIPE,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL)
+        for r in [" %s" % time.strftime("%I:%M")] + rows:
             p.stdin.write(("%s\n" % r).encode())
         p.stdin.flush()
 
@@ -139,3 +150,4 @@ def main(sensor_id):
 
 if __name__ == "__main__":
     main(sys.argv[1])
+
